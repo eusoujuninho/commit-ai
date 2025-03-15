@@ -46,6 +46,16 @@ Na primeira execução, configure a ferramenta:
 commit-ai --configure
 ```
 
+### Binários Pré-compilados
+
+Para facilitar a instalação, disponibilizamos binários pré-compilados para os principais sistemas operacionais:
+
+- **Linux**: `bin/commit-ai-linux-amd64`
+- **macOS**: `bin/commit-ai-darwin-amd64`
+- **Windows**: `bin/commit-ai-windows-amd64.exe`
+
+Não é necessário ter Go instalado para usar os binários pré-compilados. Basta baixar o binário adequado para seu sistema operacional, torná-lo executável (Linux/macOS) e movê-lo para um diretório no seu PATH.
+
 ### Uso básico
 
 ```bash

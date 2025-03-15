@@ -4,6 +4,9 @@
 *.dll
 *.so
 *.dylib
+# Não ignorar binários pré-compilados na pasta bin/
+!bin/commit-ai-*
+!bin/checksums.txt
 
 # Arquivos de teste
 *.test

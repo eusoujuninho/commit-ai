@@ -10,6 +10,7 @@ Commit-AI is a Go-based utility that automates the generation of Git commit mess
 - [Features](#features)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
+  - [Pre-compiled Binaries](#pre-compiled-binaries)
   - [Building from Source](#building-from-source)
   - [Installation Options](#installation-options)
 - [Configuration](#configuration)
@@ -91,6 +92,42 @@ Before installing Commit-AI, ensure you have the following:
   - Grok (xAI)
 - (Optional) Ollama installed locally for using local AI models without API keys
 
+### Pre-compiled Binaries
+
+For convenience, Commit-AI provides pre-compiled binaries for major operating systems. These binaries are available in the `bin/` directory of the project repository:
+
+- **Linux**: `bin/commit-ai-linux-amd64`
+- **macOS**: `bin/commit-ai-darwin-amd64`
+- **Windows**: `bin/commit-ai-windows-amd64.exe`
+
+To use a pre-compiled binary:
+
+1. Download the appropriate binary for your operating system
+2. Verify the integrity of the binary using the checksums in `bin/checksums.txt`:
+   ```bash
+   sha256sum -c checksums.txt
+   ```
+3. Make it executable (Linux/macOS):
+   ```bash
+   chmod +x commit-ai-linux-amd64
+   ```
+4. Move it to a location in your PATH:
+
+   **Linux/macOS**:
+   ```bash
+   sudo mv commit-ai-linux-amd64 /usr/local/bin/commit-ai
+   ```
+   or without sudo:
+   ```bash
+   mv commit-ai-linux-amd64 ~/bin/commit-ai
+   ```
+
+   **Windows**:
+   - Move `commit-ai-windows-amd64.exe` to a directory in your PATH
+   - Optionally rename it to `commit-ai.exe` for convenience
+
+Using pre-compiled binaries eliminates the need to have Go installed on your system and simplifies the installation process.
+
 ### Building from Source
 
 1. Clone the repository:
@@ -112,27 +149,66 @@ Before installing Commit-AI, ensure you have the following:
    ```bash
    go install
    ```
+   This will compile and install the binary to your Go bin directory (usually `~/go/bin/`).
 
 ### Installation Options
 
-#### Local Installation
+#### Global Installation
+
+You can install Commit-AI globally on your system using one of these methods:
+
+##### Using Go Install (Recommended)
+
+If you have Go installed, the easiest way to install Commit-AI globally is:
+
+```bash
+# From anywhere
+go install github.com/user/commit-ai@latest
+
+# Or from the project directory
+cd path/to/commit-ai
+go install
+```
+
+This will:
+- Compile the application
+- Place the binary in your `$GOPATH/bin` directory (usually `~/go/bin/`)
+- Make it available as `commit-ai` command if your `$GOPATH/bin` is in your PATH
+
+To verify the installation:
+```bash
+which commit-ai     # Should show something like /home/juninho/go/bin/commit-ai
+commit-ai --version # Should display: "Commit-AI versão 0.1.0"
+```
+
+> **Note**: Make sure your `$GOPATH/bin` directory is in your PATH. You can check your GOPATH with `go env GOPATH`. You can add it to your PATH by adding this line to your `.bashrc` or `.zshrc` file:
+> ```bash
+> export PATH="$PATH:$(go env GOPATH)/bin"
+> ```
+
+##### Manual Installation
 
 After building, you can move the binary to a location in your PATH:
 
 ```bash
-# Linux/macOS
+# Linux/macOS (requires admin privileges)
 sudo mv commit-ai /usr/local/bin/
 
 # Alternative (no sudo required)
 mv commit-ai ~/bin/  # Ensure ~/bin is in your PATH
 ```
 
-#### Go Install
+#### Docker Installation
 
-If you have Go installed, you can install directly using:
+For containerized usage, you can build and run a Docker image:
 
 ```bash
-go install github.com/user/commit-ai@latest
+# Build the Docker image
+docker build -t commit-ai .
+
+# Run Commit-AI in a Docker container
+# Mount your Git repository to /repo inside the container
+docker run -it -v $(pwd):/repo commit-ai --repo=/repo
 ```
 
 ## Configuration
