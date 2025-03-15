@@ -15,6 +15,7 @@ Commit-AI analyzes changes made in a Git repository and generates meaningful com
 - Provides an intuitive command-line interface
 - Includes persistent and customizable configuration
 - Offers "dry-run" mode to preview messages before committing
+- Features continuous monitoring with automatic commits (Watcher mode)
 
 ## Installation
 
@@ -72,6 +73,40 @@ commit-ai
 - `--provider=NAME`: Overrides the AI provider for this run
 - `--language=CODE`: Overrides the language for this run
 - `--version`: Displays version information
+- `--watch`: Activates watcher mode for continuous monitoring
+- `--interval=DURATION`: Sets the time between checks in watcher mode (default: 30s)
+- `--min-changes=N`: Minimum number of changes to trigger a commit (default: 1)
+- `--ignore=PATTERNS`: List of patterns to ignore, separated by commas
+- `--silent`: Silent mode for watcher (less output)
+
+### Watcher Mode
+
+Commit-AI can continuously monitor your repository and automatically make commits when changes are detected:
+
+```bash
+# Basic watcher mode with default settings
+commit-ai --watch
+
+# Custom configuration with longer interval and more changes required
+commit-ai --watch --interval=5m --min-changes=3
+
+# Watcher mode with specific provider and language
+commit-ai --watch --provider=claude --language=en
+
+# Ignore specific file patterns
+commit-ai --watch --ignore=*.log,tmp/,node_modules/
+
+# Silent mode with less console output
+commit-ai --watch --silent
+```
+
+The watcher mode is perfect for:
+- Continuous development sessions where you want automatic versioning
+- Ensuring regular commits without manual intervention
+- Creating detailed commit history automatically
+- Projects where you prefer frequent, smaller commits
+
+Watcher mode can be combined with `--dry-run` to test the behavior without making actual commits.
 
 ## Contributing
 
