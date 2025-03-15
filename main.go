@@ -15,7 +15,7 @@ import (
 )
 
 // Versão do aplicativo
-const version = "0.1.0"
+const version = "0.2.0"
 
 // Chave da API Gemini fornecida
 const defaultGeminiAPIKey = "AIzaSyBqFvUFUHK6Cj6pk7JVpjpWmOaJJIiq6rQ"
