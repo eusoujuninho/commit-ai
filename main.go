@@ -18,6 +18,9 @@ const version = "0.1.0"
 // Chave da API Gemini fornecida
 const defaultGeminiAPIKey = "AIzaSyBqFvUFUHK6Cj6pk7JVpjpWmOaJJIiq6rQ"
 
+// Comentário para teste de commit em diferentes idiomas
+// This is a test comment to demonstrate commit messages in different languages
+
 func main() {
 	// Definir flags da linha de comando
 	configureFlag := flag.Bool("configure", false, "Configurar a aplicação")
