@@ -25,6 +25,30 @@ Commit-AI analyzes changes made in a Git repository and generates meaningful com
 - For building from source: Go 1.16 or later
 - API key for at least one of the supported AI providers (not needed for Ollama)
 
+### Easy Installation (Recommended)
+
+For a quick and user-friendly installation:
+
+```bash
+# Clone the repository
+git clone https://github.com/user/commit-ai.git
+
+# Navigate to the directory
+cd commit-ai
+
+# Run the installation script
+./install.sh
+
+# After installation, run the setup wizard for guided configuration
+./setup-wizard.sh
+```
+
+The installation script will automatically:
+- Detect your operating system
+- Install the appropriate binary globally
+- Add it to your PATH
+- Guide you through initial configuration
+
 ### Pre-compiled Binaries
 
 For convenience, we provide pre-compiled binaries for major operating systems:
