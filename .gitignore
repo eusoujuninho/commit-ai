@@ -1,0 +1,31 @@
+# Binários compilados
+/commit-ai
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Arquivos de teste
+*.test
+*.tmp
+
+# Arquivos de saída de cobertura
+*.out
+*.prof
+
+# Dependências
+/vendor/
+
+# Arquivos de IDE e editores
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Arquivos de sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de configuração local
+.commit-ai/ 
