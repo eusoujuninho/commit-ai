@@ -57,6 +57,11 @@ Commit-AI is a Go-based utility that automates the generation of Git commit mess
 - [FAQ](#faq)
 - [License](#license)
 - [Contributing](#contributing)
+- [Modos de Operação](#modos-de-operação)
+  - [Commit Padrão](#commit-padrão)
+  - [Modo Dry-Run](#modo-dry-run)
+  - [Modo Watcher](#modo-watcher)
+- [Opções de Linha de Comando](#opções-de-linha-de-comando)
 
 ## Introduction
 
@@ -305,6 +310,11 @@ Commit-AI supports the following command-line options:
 | `--provider=NAME` | Override the AI provider (gemini/openai/claude/deepseek/openrouter/grok/ollama) for this run |
 | `--language=CODE` | Override the language (pt-br/en/es/fr/de) for this run |
 | `--version` | Display the version information |
+| `--watch` | Ativa o modo watcher (monitoramento contínuo) |
+| `--interval=DURATION` | Define o intervalo entre verificações no modo watcher (padrão: 30s) |
+| `--min-changes=N` | Número mínimo de alterações para acionar um commit (padrão: 1) |
+| `--ignore=PATTERNS` | Lista de padrões a ignorar, separados por vírgula |
+| `--silent` | Modo silencioso para watcher (menos output) |
 
 ### Exit Codes
 
@@ -667,4 +677,45 @@ Commit-AI is licensed under the MIT License. See the LICENSE file for details.
 
 ## Contributing
 
-Contributions to Commit-AI are welcome! Please feel free to submit pull requests, report bugs, or suggest features. 
+Contributions to Commit-AI are welcome! Please feel free to submit pull requests, report bugs, or suggest features.
+
+## Modos de Operação
+
+### Commit Padrão
+
+### Modo Dry-Run
+
+### Modo Watcher
+
+O Commit-AI oferece um modo de monitoramento contínuo (watcher) que observa as alterações no repositório em tempo real e realiza commits automáticos quando detectadas mudanças significativas.
+
+Para ativar o modo watcher:
+
+```bash
+commit-ai --watch
+```
+
+Opções adicionais para o modo watcher:
+
+- `--interval=DURATION`: Define o intervalo mínimo entre verificações de alterações (exemplo: 30s, 1m, 5m). Padrão: 30s.
+- `--min-changes=N`: Define o número mínimo de arquivos alterados para acionar um commit. Padrão: 1.
+- `--ignore=PATTERNS`: Lista de padrões de arquivos a serem ignorados, separados por vírgula (exemplo: "*.log,tmp/,*.bak"). Padrão: .git/,*.tmp,*.log,*~
+- `--silent`: Reduz a quantidade de mensagens de log exibidas durante o monitoramento.
+
+O modo watcher pode ser combinado com outras opções como `--provider`, `--language` e `--dry-run`:
+
+```bash
+commit-ai --watch --provider=claude --interval=2m --min-changes=3 --language=en
+```
+
+No exemplo acima, o Commit-AI verificará alterações a cada 2 minutos e realizará commits automáticos quando houver pelo menos 3 arquivos alterados, utilizando o provedor Claude para gerar mensagens de commit em inglês.
+
+## Opções de Linha de Comando
+
+| Flag                 | Descrição                                                                             |
+|----------------------|---------------------------------------------------------------------------------------|
+| --watch              | Ativa o modo watcher (monitoramento contínuo)                                         |
+| --interval=DURATION  | Define o intervalo entre verificações no modo watcher (padrão: 30s)                   |
+| --min-changes=N      | Número mínimo de alterações para acionar um commit (padrão: 1)                        |
+| --ignore=PATTERNS    | Lista de padrões a ignorar, separados por vírgula                                     |
+| --silent             | Modo silencioso para watcher (menos output)                                           | 

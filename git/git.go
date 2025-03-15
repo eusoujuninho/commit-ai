@@ -188,3 +188,21 @@ func (r *Repository) Commit(message string) error {
 
 	return nil
 }
+
+// AddFilesToStage adiciona uma lista de arquivos para a área de stage
+func (r *Repository) AddFilesToStage(files []string) error {
+	w, err := r.repo.Worktree()
+	if err != nil {
+		return err
+	}
+
+	// Adicionar cada arquivo ao stage
+	for _, file := range files {
+		_, err = w.Add(file)
+		if err != nil {
+			return fmt.Errorf("erro ao adicionar arquivo %s: %w", file, err)
+		}
+	}
+
+	return nil
+}

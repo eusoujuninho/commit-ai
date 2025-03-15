@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/user/commit-ai/ai"
 	"github.com/user/commit-ai/config"
 	"github.com/user/commit-ai/git"
+	"github.com/user/commit-ai/watcher"
 )
 
 // Versão do aplicativo
@@ -29,6 +31,13 @@ func main() {
 	versionFlag := flag.Bool("version", false, "Mostrar a versão do aplicativo")
 	providerFlag := flag.String("provider", "", "Provedor de IA a ser usado (openai, gemini, claude, deepseek, openrouter, grok, ollama)")
 	languageFlag := flag.String("language", "", "Idioma para a mensagem de commit (pt-br, en, es, fr, de)")
+
+	// Flags para o modo watcher
+	watcherMode := flag.Bool("watch", false, "Ativar modo watcher (monitoramento contínuo)")
+	watchInterval := flag.Duration("interval", 30*time.Second, "Intervalo entre verificações no modo watcher")
+	minChanges := flag.Int("min-changes", 1, "Número mínimo de alterações para acionar um commit no modo watcher")
+	watcherSilent := flag.Bool("silent", false, "Modo silencioso para watcher (menos output)")
+	ignorePatterns := flag.String("ignore", ".git/,*.tmp,*.log,*~", "Lista de padrões a ignorar (separados por vírgula)")
 
 	// Analisar flags
 	flag.Parse()
@@ -62,6 +71,58 @@ func main() {
 		if err := config.SaveConfig(cfg); err != nil {
 			fmt.Fprintf(os.Stderr, "Erro ao salvar configuração: %v\n", err)
 		}
+	}
+
+	// Verificar se é modo watcher
+	if *watcherMode {
+		cfg, err := config.LoadConfig()
+		if err != nil {
+			fmt.Printf("Erro ao carregar configuração: %v\nUtilizando configuração padrão.\n", err)
+			cfg = config.DefaultConfig()
+		}
+
+		// Configurar opções do watcher
+		options := watcher.DefaultCommitOptions()
+		options.Interval = *watchInterval
+		options.MinChanges = *minChanges
+		options.Provider = *providerFlag
+		options.Language = *languageFlag
+		options.Silent = *watcherSilent
+		options.DoCommit = !*dryRunFlag
+		options.AutoStage = true
+
+		// Processar padrões a ignorar
+		if *ignorePatterns != "" {
+			options.IgnorePatterns = strings.Split(*ignorePatterns, ",")
+		}
+
+		// Determinar o caminho do repositório
+		repoPath := *repoPathFlag
+		if repoPath == "" {
+			repoPath = cfg.RepoPath
+			if repoPath == "" {
+				var err error
+				repoPath, err = os.Getwd()
+				if err != nil {
+					fmt.Printf("Erro ao obter diretório atual: %v\n", err)
+					os.Exit(1)
+				}
+			}
+		}
+
+		// Iniciar o watcher
+		fmt.Printf("Iniciando modo watcher para o repositório: %s\n", repoPath)
+		fmt.Printf("Intervalo: %s, Mínimo de alterações: %d\n", options.Interval, options.MinChanges)
+		fmt.Printf("Provedor de IA: %s, Modo de commit: %v\n", options.Provider, options.DoCommit)
+
+		err = watcher.StartWatcher(repoPath, cfg, options)
+		if err != nil {
+			fmt.Printf("Erro ao iniciar watcher: %v\n", err)
+			os.Exit(1)
+		}
+
+		// O watcher roda indefinidamente, então não deve chegar aqui
+		return
 	}
 
 	// Modo de configuração
