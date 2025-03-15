@@ -27,7 +27,7 @@ func main() {
 	dryRunFlag := flag.Bool("dry-run", false, "Apenas mostrar a mensagem de commit sem fazer o commit")
 	repoPathFlag := flag.String("repo", "", "Caminho para o repositório Git")
 	versionFlag := flag.Bool("version", false, "Mostrar a versão do aplicativo")
-	providerFlag := flag.String("provider", "", "Provedor de IA a ser usado (openai, gemini, claude, deepseek, openrouter, grok)")
+	providerFlag := flag.String("provider", "", "Provedor de IA a ser usado (openai, gemini, claude, deepseek, openrouter, grok, ollama)")
 	languageFlag := flag.String("language", "", "Idioma para a mensagem de commit (pt-br, en, es, fr, de)")
 
 	// Analisar flags
@@ -143,6 +143,9 @@ func main() {
 	case "grok":
 		fmt.Println("Usando provedor Grok (xAI)...")
 		provider = ai.NewGrokProvider(cfg.GrokKey)
+	case "ollama":
+		fmt.Println("Usando provedor Ollama (modelo local)...")
+		provider = ai.NewOllamaProvider(cfg.OllamaURL, cfg.OllamaModel)
 	default:
 		fmt.Fprintf(os.Stderr, "Provedor de IA desconhecido: %s, usando Gemini como fallback\n", cfg.AIProvider)
 		provider = ai.NewGeminiProvider(cfg.GeminiKey)
@@ -252,10 +255,10 @@ func configureApp(cfg *config.Config) {
 	fmt.Println("=== Configuração do Commit-AI ===")
 
 	// Configurar provedor de IA
-	fmt.Printf("Provedor de IA (openai/gemini/claude/deepseek/openrouter/grok) [%s]: ", cfg.AIProvider)
+	fmt.Printf("Provedor de IA (openai/gemini/claude/deepseek/openrouter/grok/ollama) [%s]: ", cfg.AIProvider)
 	input, _ := reader.ReadString('\n')
 	input = strings.TrimSpace(strings.ToLower(input))
-	if input == "openai" || input == "gemini" || input == "claude" || input == "deepseek" || input == "openrouter" || input == "grok" {
+	if input == "openai" || input == "gemini" || input == "claude" || input == "deepseek" || input == "openrouter" || input == "grok" || input == "ollama" {
 		cfg.AIProvider = input
 	}
 
@@ -309,6 +312,20 @@ func configureApp(cfg *config.Config) {
 		input = strings.TrimSpace(input)
 		if input != "" {
 			cfg.GrokKey = input
+		}
+	case "ollama":
+		fmt.Printf("URL do servidor Ollama [%s]: ", cfg.OllamaURL)
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+		if input != "" {
+			cfg.OllamaURL = input
+		}
+
+		fmt.Printf("Modelo Ollama a ser usado [%s]: ", cfg.OllamaModel)
+		input, _ = reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+		if input != "" {
+			cfg.OllamaModel = input
 		}
 	}
 

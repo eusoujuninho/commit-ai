@@ -32,6 +32,7 @@ Commit-AI is a Go-based utility that automates the generation of Git commit mess
   - [DeepSeek](#deepseek)
   - [OpenRouter](#openrouter)
   - [Grok (xAI)](#grok-xai)
+  - [Ollama (Local Models)](#ollama-local-models)
   - [Adding New Providers](#adding-new-providers)
 - [Multilingual Support](#multilingual-support)
   - [Available Languages](#available-languages)
@@ -42,6 +43,7 @@ Commit-AI is a Go-based utility that automates the generation of Git commit mess
   - [Custom Repository Path](#custom-repository-path)
   - [Auto-commit Mode](#auto-commit-mode)
   - [Using Different Languages](#using-different-languages)
+  - [Using Ollama Local Models](#using-ollama-local-models)
 - [Architecture](#architecture)
   - [Component Overview](#component-overview)
   - [Data Flow](#data-flow)
@@ -64,6 +66,7 @@ Commit-AI simplifies the process of writing meaningful Git commit messages by le
 - Automatically detects modified files in Git repositories
 - Generates commit messages in the Conventional Commits format
 - Supports multiple AI providers (Google Gemini, OpenAI, Claude, DeepSeek, OpenRouter, Grok)
+- Supports local AI models through Ollama integration
 - Provides multilingual support (Portuguese, English, Spanish, French, German)
 - Provides an intuitive command-line interface
 - Offers customizable settings through a configuration file
@@ -86,6 +89,7 @@ Before installing Commit-AI, ensure you have the following:
   - DeepSeek
   - OpenRouter
   - Grok (xAI)
+- (Optional) Ollama installed locally for using local AI models without API keys
 
 ### Building from Source
 
@@ -142,8 +146,8 @@ commit-ai --configure
 ```
 
 This will prompt you for:
-- AI provider selection (Gemini, OpenAI, Claude, DeepSeek, OpenRouter, or Grok)
-- API key for the selected provider
+- AI provider selection (Gemini, OpenAI, Claude, DeepSeek, OpenRouter, Grok, or Ollama)
+- API key for the selected provider (or server URL and model for Ollama)
 - Preferred language for commit messages
 - Default repository path (optional)
 - Auto-commit preference (true/false)
@@ -161,6 +165,8 @@ The configuration is stored in `~/.commit-ai/config.json` with the following str
   "deepseek_key": "",
   "openrouter_key": "",
   "grok_key": "",
+  "ollama_url": "http://localhost:11434",
+  "ollama_model": "llama3",
   "language": "pt-br",
   "repo_path": "",
   "auto_commit": false,
@@ -178,6 +184,7 @@ Commit-AI supports the following AI providers:
 - **DeepSeek**: DeepSeek AI models
 - **OpenRouter**: Unified API access to multiple AI models
 - **Grok**: xAI's Grok model
+- **Ollama**: Local AI models running on your own machine
 
 ### Language Support
 
@@ -219,7 +226,7 @@ Commit-AI supports the following command-line options:
 | `--configure` | Run the configuration wizard |
 | `--dry-run` | Generate a commit message without performing a commit |
 | `--repo=PATH` | Specify a custom repository path |
-| `--provider=NAME` | Override the AI provider (gemini/openai/claude/deepseek/openrouter/grok) for this run |
+| `--provider=NAME` | Override the AI provider (gemini/openai/claude/deepseek/openrouter/grok/ollama) for this run |
 | `--language=CODE` | Override the language (pt-br/en/es/fr/de) for this run |
 | `--version` | Display the version information |
 
@@ -328,6 +335,30 @@ To use Grok as your AI provider:
 
 Grok is the AI model developed by xAI, offering strong capabilities for code understanding and generating concise, meaningful commit messages.
 
+### Ollama (Local Models)
+
+To use Ollama as your AI provider:
+
+1. Install Ollama on your local machine from [Ollama.ai](https://ollama.ai/)
+2. Pull and run a model (e.g., llama3, mistral, codellama):
+   ```bash
+   ollama pull llama3
+   ```
+3. Configure Commit-AI to use Ollama:
+   ```bash
+   commit-ai --configure
+   # Select "ollama" as provider and configure URL and model
+   ```
+
+Using Ollama provides several advantages:
+- **Privacy**: Your code changes never leave your machine
+- **No API Key Required**: Run models without needing external API keys
+- **Offline Usage**: Generate commit messages without internet access
+- **Cost-Free**: No usage charges or token limits
+- **Model Selection**: Choose from various models based on your needs
+
+Commit-AI is configured to use Ollama on `http://localhost:11434` by default, which is Ollama's standard address. The default model is `llama3`, but you can configure any model you've pulled to Ollama.
+
 ### Adding New Providers
 
 Commit-AI is designed to be extensible. New AI providers can be added by implementing the `Provider` interface in the `ai` package:
@@ -433,6 +464,32 @@ commit-ai --language=es
 # Generate commit message with a specific provider in French
 commit-ai --provider=openai --language=fr
 ```
+
+### Using Ollama Local Models
+
+```bash
+# Generate commit message using Ollama local model with default settings
+commit-ai --provider=ollama
+
+# Generate commit message using Ollama with a specific model
+# (assuming you've already pulled the model with 'ollama pull codellama')
+commit-ai --provider=ollama
+# Then configure the model during the commit process
+
+# Use Ollama with a specific language
+commit-ai --provider=ollama --language=en
+```
+
+To set up Ollama as your default provider:
+
+```bash
+commit-ai --configure
+# Select "ollama" as the provider
+# Specify the URL (default: http://localhost:11434)
+# Choose your preferred model (e.g., llama3, mistral, codellama)
+```
+
+When using Ollama, your code changes remain on your local machine, providing enhanced privacy.
 
 ## Architecture
 

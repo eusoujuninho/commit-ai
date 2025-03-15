@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 // Provider define a interface para provedores de IA
@@ -86,6 +87,20 @@ func NewGrokProvider(apiKey string) *GrokProvider {
 	}
 }
 
+// OllamaProvider implementa a interface Provider para o Ollama (modelos locais)
+type OllamaProvider struct {
+	ServerURL string
+	Model     string
+}
+
+// NewOllamaProvider cria uma nova instância de OllamaProvider
+func NewOllamaProvider(serverURL string, model string) *OllamaProvider {
+	return &OllamaProvider{
+		ServerURL: serverURL,
+		Model:     model,
+	}
+}
+
 // Estruturas para a requisição à API da OpenAI e Gemini (compatível)
 type openAIRequest struct {
 	Model     string    `json:"model"`
@@ -117,6 +132,20 @@ type claudeResponse struct {
 	Content []struct {
 		Text string `json:"text"`
 	} `json:"content"`
+}
+
+// Estrutura para requisição ao Ollama
+type ollamaRequest struct {
+	Model    string    `json:"model"`
+	Messages []message `json:"messages"`
+	Stream   bool      `json:"stream"`
+}
+
+// Estrutura para resposta do Ollama
+type ollamaResponse struct {
+	Message struct {
+		Content string `json:"content"`
+	} `json:"message"`
 }
 
 // getLanguagePrompt retorna o prompt adequado para o idioma solicitado
@@ -572,4 +601,77 @@ func (p *GrokProvider) GenerateCommitMessage(changes string, language string) (s
 	}
 
 	return grokResp.Choices[0].Message.Content, nil
+}
+
+// GenerateCommitMessage gera uma mensagem de commit com base nas mudanças usando Ollama
+func (p *OllamaProvider) GenerateCommitMessage(changes string, language string) (string, error) {
+	// Se a URL do servidor não estiver configurada, retornar um exemplo de mensagem
+	if p.ServerURL == "" {
+		return "feat: implementação inicial (URL do servidor Ollama não configurada)", nil
+	}
+
+	// Se o modelo não estiver especificado, usar um padrão
+	model := p.Model
+	if model == "" {
+		model = "llama3" // Modelo padrão
+	}
+
+	prompt := getLanguagePrompt(changes, language)
+
+	// Ollama usa uma API compatível com OpenAI para chat
+	reqBody := ollamaRequest{
+		Model: model,
+		Messages: []message{
+			{
+				Role:    "system",
+				Content: getSystemPrompt(language),
+			},
+			{
+				Role:    "user",
+				Content: prompt,
+			},
+		},
+		Stream: false, // Não usar streaming para simplificar
+	}
+
+	reqJSON, err := json.Marshal(reqBody)
+	if err != nil {
+		return "", err
+	}
+
+	// Montar a URL completa para o endpoint de chat
+	url := fmt.Sprintf("%s/api/chat", p.ServerURL)
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqJSON))
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{
+		Timeout: 30 * time.Second, // Modelos locais podem ser mais lentos
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("erro ao conectar ao servidor Ollama: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("erro na API do Ollama (status %d): %s", resp.StatusCode, body)
+	}
+
+	var ollamaResp ollamaResponse
+	if err := json.NewDecoder(resp.Body).Decode(&ollamaResp); err != nil {
+		return "", fmt.Errorf("erro ao decodificar resposta do Ollama: %w", err)
+	}
+
+	// Verificar se a resposta contém uma mensagem
+	if ollamaResp.Message.Content == "" {
+		return "", fmt.Errorf("nenhuma resposta gerada pelo Ollama")
+	}
+
+	return ollamaResp.Message.Content, nil
 }

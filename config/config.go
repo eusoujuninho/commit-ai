@@ -16,6 +16,8 @@ type Config struct {
 	DeepSeekKey   string `json:"deepseek_key"`   // Nova chave para API do DeepSeek
 	OpenRouterKey string `json:"openrouter_key"` // Nova chave para API do OpenRouter
 	GrokKey       string `json:"grok_key"`       // Nova chave para API do Grok
+	OllamaURL     string `json:"ollama_url"`     // URL do servidor Ollama
+	OllamaModel   string `json:"ollama_model"`   // Modelo Ollama a ser usado
 	RepoPath      string `json:"repo_path"`
 	AutoCommit    bool   `json:"auto_commit"`
 	CommitStyle   string `json:"commit_style"`
@@ -28,10 +30,12 @@ func DefaultConfig() *Config {
 		AIProvider:    "gemini",
 		OpenAIKey:     "",
 		GeminiKey:     "",
-		ClaudeKey:     "", // Inicializado vazio
-		DeepSeekKey:   "", // Inicializado vazio
-		OpenRouterKey: "", // Inicializado vazio
-		GrokKey:       "", // Inicializado vazio
+		ClaudeKey:     "",                       // Inicializado vazio
+		DeepSeekKey:   "",                       // Inicializado vazio
+		OpenRouterKey: "",                       // Inicializado vazio
+		GrokKey:       "",                       // Inicializado vazio
+		OllamaURL:     "http://localhost:11434", // URL padrão do Ollama
+		OllamaModel:   "llama3",                 // Modelo padrão do Ollama
 		RepoPath:      "",
 		AutoCommit:    false,
 		CommitStyle:   "conventional",
