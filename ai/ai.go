@@ -152,65 +152,125 @@ type ollamaResponse struct {
 func getLanguagePrompt(changes string, language string) string {
 	switch language {
 	case "en":
-		return fmt.Sprintf(`Analyze the following code changes and generate a concise and meaningful commit message in the conventional format:
+		return fmt.Sprintf(`Analyze the following code changes in detail and generate a comprehensive, meaningful commit message following the Conventional Commits format:
 
 %s
 
-The message should:
+You must:
 1. Follow the Conventional Commits format (type: description)
-2. Be clear and descriptive
-3. Have a maximum of 72 characters
-4. Start with one of the following types: feat, fix, docs, style, refactor, perf, test, build, ci, chore
+2. Be specific and precise about what was changed and why
+3. Look at the actual code changes in the diff, not just the file names
+4. Focus on the technical details and functional impacts of the changes
+5. Limit to a maximum of 100 characters (for the first line)
+6. Start with one of these types based on the nature of the changes:
+   - feat: A new feature 
+   - fix: A bug fix
+   - docs: Documentation only changes
+   - style: Changes that do not affect the meaning of the code (white-space, formatting, etc)
+   - refactor: A code change that neither fixes a bug nor adds a feature
+   - perf: A code change that improves performance
+   - test: Adding missing tests or correcting existing tests
+   - build: Changes that affect the build system or external dependencies
+   - ci: Changes to CI configuration files and scripts
+   - chore: Other changes that don't modify src or test files
 
-Only respond with the commit message, without additional explanations.`, changes)
+Only respond with the commit message without any additional explanation or commentary.`, changes)
 	case "es":
-		return fmt.Sprintf(`Analiza los siguientes cambios en el código y genera un mensaje de commit conciso y significativo en formato convencional:
+		return fmt.Sprintf(`Analiza en detalle los siguientes cambios de código y genera un mensaje de commit completo y significativo siguiendo el formato de Conventional Commits:
 
 %s
 
-El mensaje debe:
+Debes:
 1. Seguir el formato de Conventional Commits (tipo: descripción)
-2. Ser claro y descriptivo
-3. Tener un máximo de 72 caracteres
-4. Comenzar con uno de los siguientes tipos: feat, fix, docs, style, refactor, perf, test, build, ci, chore
+2. Ser específico y preciso sobre qué se cambió y por qué
+3. Analizar los cambios reales en el código del diff, no solo los nombres de los archivos
+4. Enfocarte en los detalles técnicos y el impacto funcional de los cambios
+5. Limitar a un máximo de 100 caracteres (para la primera línea)
+6. Comenzar con uno de estos tipos basado en la naturaleza de los cambios:
+   - feat: Una nueva característica
+   - fix: Corrección de un error
+   - docs: Cambios solo en documentación
+   - style: Cambios que no afectan el significado del código (espacios en blanco, formato, etc)
+   - refactor: Un cambio de código que no corrige un error ni agrega una característica
+   - perf: Un cambio de código que mejora el rendimiento
+   - test: Agregar pruebas faltantes o corregir pruebas existentes
+   - build: Cambios que afectan el sistema de compilación o dependencias externas
+   - ci: Cambios en los archivos de configuración y scripts de CI
+   - chore: Otros cambios que no modifican los archivos src o test
 
-Solo responde con el mensaje de commit, sin explicaciones adicionales.`, changes)
+Responde solamente con el mensaje de commit sin ninguna explicación o comentario adicional.`, changes)
 	case "fr":
-		return fmt.Sprintf(`Analysez les modifications de code suivantes et générez un message de commit concis et significatif au format conventionnel:
+		return fmt.Sprintf(`Analysez en détail les modifications de code suivantes et générez un message de commit complet et significatif suivant le format Conventional Commits:
 
 %s
 
-Le message doit:
+Vous devez:
 1. Suivre le format Conventional Commits (type: description)
-2. Être clair et descriptif
-3. Avoir un maximum de 72 caractères
-4. Commencer par l'un des types suivants: feat, fix, docs, style, refactor, perf, test, build, ci, chore
+2. Être spécifique et précis sur ce qui a été modifié et pourquoi
+3. Examiner les changements réels dans le code du diff, pas seulement les noms de fichiers
+4. Vous concentrer sur les détails techniques et les impacts fonctionnels des modifications
+5. Limiter à un maximum de 100 caractères (pour la première ligne)
+6. Commencer par l'un de ces types en fonction de la nature des changements:
+   - feat: Une nouvelle fonctionnalité
+   - fix: Correction d'un bug
+   - docs: Modifications de la documentation uniquement
+   - style: Changements qui n'affectent pas la signification du code (espace, formatage, etc)
+   - refactor: Une modification du code qui ne corrige pas un bug et n'ajoute pas de fonctionnalité
+   - perf: Une modification du code qui améliore les performances
+   - test: Ajout de tests manquants ou correction de tests existants
+   - build: Modifications affectant le système de build ou les dépendances externes
+   - ci: Modifications des fichiers de configuration CI et des scripts
+   - chore: Autres changements qui ne modifient pas les fichiers src ou test
 
-Répondez uniquement avec le message de commit, sans explications supplémentaires.`, changes)
+Répondez uniquement avec le message de commit sans aucune explication ou commentaire supplémentaire.`, changes)
 	case "de":
-		return fmt.Sprintf(`Analysieren Sie die folgenden Codeänderungen und generieren Sie eine prägnante und aussagekräftige Commit-Nachricht im konventionellen Format:
+		return fmt.Sprintf(`Analysieren Sie die folgenden Codeänderungen im Detail und generieren Sie eine umfassende, aussagekräftige Commit-Nachricht im Conventional Commits-Format:
 
 %s
 
-Die Nachricht sollte:
-1. Dem Format von Conventional Commits folgen (Typ: Beschreibung)
-2. Klar und beschreibend sein
-3. Maximal 72 Zeichen haben
-4. Mit einem der folgenden Typen beginnen: feat, fix, docs, style, refactor, perf, test, build, ci, chore
+Sie müssen:
+1. Das Conventional Commits-Format befolgen (Typ: Beschreibung)
+2. Spezifisch und präzise angeben, was geändert wurde und warum
+3. Die tatsächlichen Codeänderungen im Diff betrachten, nicht nur die Dateinamen
+4. Sich auf die technischen Details und funktionalen Auswirkungen der Änderungen konzentrieren
+5. Auf maximal 100 Zeichen beschränken (für die erste Zeile)
+6. Mit einem dieser Typen beginnen, basierend auf der Art der Änderungen:
+   - feat: Eine neue Funktion
+   - fix: Eine Fehlerbehebung
+   - docs: Änderungen nur an der Dokumentation
+   - style: Änderungen, die die Bedeutung des Codes nicht beeinflussen (Leerzeichen, Formatierung, usw.)
+   - refactor: Eine Codeänderung, die weder einen Fehler behebt noch eine Funktion hinzufügt
+   - perf: Eine Codeänderung, die die Leistung verbessert
+   - test: Hinzufügen fehlender Tests oder Korrigieren vorhandener Tests
+   - build: Änderungen, die das Build-System oder externe Abhängigkeiten betreffen
+   - ci: Änderungen an CI-Konfigurationsdateien und Skripten
+   - chore: Andere Änderungen, die keine src- oder test-Dateien modifizieren
 
-Antworten Sie nur mit der Commit-Nachricht, ohne zusätzliche Erklärungen.`, changes)
+Antworten Sie nur mit der Commit-Nachricht ohne zusätzliche Erklärungen oder Kommentare.`, changes)
 	default: // Padrão é português pt-br
-		return fmt.Sprintf(`Analise as seguintes mudanças no código e gere uma mensagem de commit concisa e significativa no formato convencional:
+		return fmt.Sprintf(`Analise detalhadamente as seguintes mudanças no código e gere uma mensagem de commit abrangente e significativa seguindo o formato de Conventional Commits:
 
 %s
 
-A mensagem deve:
+Você deve:
 1. Seguir o formato de Conventional Commits (tipo: descrição)
-2. Ser clara e descritiva
-3. Ter no máximo 72 caracteres
-4. Começar com um dos seguintes tipos: feat, fix, docs, style, refactor, perf, test, build, ci, chore
+2. Ser específico e preciso sobre o que foi alterado e por quê
+3. Analisar as mudanças reais no código do diff, não apenas os nomes dos arquivos
+4. Focar nos detalhes técnicos e impactos funcionais das alterações
+5. Limitar a um máximo de 100 caracteres (para a primeira linha)
+6. Começar com um destes tipos com base na natureza das alterações:
+   - feat: Uma nova funcionalidade
+   - fix: Correção de um bug
+   - docs: Alterações apenas na documentação
+   - style: Alterações que não afetam o significado do código (espaço em branco, formatação, etc)
+   - refactor: Uma alteração de código que não corrige um bug nem adiciona uma funcionalidade
+   - perf: Uma alteração de código que melhora o desempenho
+   - test: Adição de testes ausentes ou correção de testes existentes
+   - build: Alterações que afetam o sistema de compilação ou dependências externas
+   - ci: Alterações nos arquivos de configuração de CI e scripts
+   - chore: Outras alterações que não modificam arquivos src ou test
 
-Apenas responda com a mensagem de commit, sem explicações adicionais.`, changes)
+Responda apenas com a mensagem de commit sem nenhuma explicação ou comentário adicional.`, changes)
 	}
 }
 
@@ -218,15 +278,15 @@ Apenas responda com a mensagem de commit, sem explicações adicionais.`, change
 func getSystemPrompt(language string) string {
 	switch language {
 	case "en":
-		return "You are an assistant specialized in generating clear and meaningful commit messages in the Conventional Commits format."
+		return "You are an expert Git commit message generator with deep understanding of software development principles. Your task is to analyze code changes and create precise, informative commit messages that accurately describe what was changed and why. Focus on technical details and functional impacts, not just superficial changes."
 	case "es":
-		return "Eres un asistente especializado en generar mensajes de commit claros y significativos en el formato de Conventional Commits."
+		return "Eres un experto generador de mensajes de commit de Git con profundo conocimiento de los principios de desarrollo de software. Tu tarea es analizar los cambios de código y crear mensajes de commit precisos e informativos que describan con exactitud qué se cambió y por qué. Enfócate en los detalles técnicos y los impactos funcionales, no solo en los cambios superficiales."
 	case "fr":
-		return "Vous êtes un assistant spécialisé dans la génération de messages de commit clairs et significatifs au format Conventional Commits."
+		return "Vous êtes un expert en génération de messages de commit Git avec une compréhension approfondie des principes de développement logiciel. Votre tâche consiste à analyser les modifications de code et à créer des messages de commit précis et informatifs qui décrivent avec précision ce qui a été modifié et pourquoi. Concentrez-vous sur les détails techniques et les impacts fonctionnels, pas seulement sur les changements superficiels."
 	case "de":
-		return "Sie sind ein Assistent, der sich auf die Erstellung klarer und aussagekräftiger Commit-Nachrichten im Conventional Commits-Format spezialisiert hat."
+		return "Sie sind ein Experte für Git-Commit-Nachrichten mit tiefem Verständnis für Software-Entwicklungsprinzipien. Ihre Aufgabe ist es, Codeänderungen zu analysieren und präzise, informative Commit-Nachrichten zu erstellen, die genau beschreiben, was geändert wurde und warum. Konzentrieren Sie sich auf technische Details und funktionale Auswirkungen, nicht nur auf oberflächliche Änderungen."
 	default: // Padrão é português pt-br
-		return "Você é um assistente especializado em gerar mensagens de commit claras e significativas no formato de Conventional Commits."
+		return "Você é um especialista em geração de mensagens de commit Git com profundo entendimento dos princípios de desenvolvimento de software. Sua tarefa é analisar mudanças de código e criar mensagens de commit precisas e informativas que descrevam com precisão o que foi alterado e por quê. Concentre-se nos detalhes técnicos e impactos funcionais, não apenas em mudanças superficiais."
 	}
 }
 

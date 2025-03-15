@@ -4,6 +4,7 @@ package git
 import (
 	"fmt"
 	"os/exec"
+	"strings"
 
 	"github.com/go-git/go-git/v5"
 )
@@ -68,34 +69,82 @@ func (r *Repository) GetChanges() (string, error) {
 	}
 	summary += "\nDetalhes das alterações:\n"
 
-	// Executar git diff para obter as diferenças reais
-	cmd := exec.Command("git", "-C", r.Path, "diff", "--cached", "--no-color")
-	// Se não houver mudanças staged, mostrar as mudanças não staged
-	hasStagedChanges, _ := hasStaged(r.Path)
-	if !hasStagedChanges {
-		cmd = exec.Command("git", "-C", r.Path, "diff", "--no-color")
+	// Obter status detalhado das alterações
+	cmdStatus := exec.Command("git", "-C", r.Path, "status", "-v")
+	statusOutput, err := cmdStatus.Output()
+	if err == nil {
+		summary += "\nStatus do repositório:\n" + string(statusOutput) + "\n"
 	}
 
-	output, err := cmd.Output()
+	// Obter informações sobre os arquivos alterados (extensão, tipo, etc.)
+	fileInfos := make(map[string]string)
+	for _, file := range files {
+		// Verificar tipo de arquivo
+		fileType := "arquivo"
+		if strings.HasSuffix(file, ".go") {
+			fileType = "código Go"
+		} else if strings.HasSuffix(file, ".md") {
+			fileType = "documentação (Markdown)"
+		} else if strings.HasSuffix(file, ".js") {
+			fileType = "código JavaScript"
+		} else if strings.HasSuffix(file, ".html") {
+			fileType = "arquivo HTML"
+		} else if strings.HasSuffix(file, ".css") {
+			fileType = "estilo CSS"
+		} else if strings.HasSuffix(file, ".json") {
+			fileType = "dados JSON"
+		} else if strings.HasSuffix(file, ".yml") || strings.HasSuffix(file, ".yaml") {
+			fileType = "configuração YAML"
+		}
+		fileInfos[file] = fileType
+	}
+
+	fileContext := "\nContexto dos arquivos:\n"
+	for file, info := range fileInfos {
+		fileContext += fmt.Sprintf("- %s: %s\n", file, info)
+	}
+	summary += fileContext
+
+	// Executar git diff para obter as diferenças reais
+	hasStagedChanges, _ := hasStaged(r.Path)
+
+	// Obter diff mais detalhado com contexto adicional
+	var diffCmd *exec.Cmd
+	if hasStagedChanges {
+		// Obter diff das alterações staged com mais contexto
+		diffCmd = exec.Command("git", "-C", r.Path, "diff", "--cached", "--no-color", "-U10")
+	} else {
+		// Obter diff das alterações não staged com mais contexto
+		diffCmd = exec.Command("git", "-C", r.Path, "diff", "--no-color", "-U10")
+	}
+
+	output, err := diffCmd.Output()
 	if err != nil {
-		// Se falhar, tentar obter diff sem o parâmetro -C
-		cmd = exec.Command("git", "diff", "--no-color")
-		cmd.Dir = r.Path
-		output, err = cmd.Output()
+		// Se falhar, tentar com menos opções
+		diffCmd = exec.Command("git", "diff", "--no-color")
+		diffCmd.Dir = r.Path
+		output, err = diffCmd.Output()
 		if err != nil {
 			// Se ainda falhar, retornar apenas o resumo
 			return summary + "\nNão foi possível obter o diff detalhado.", nil
 		}
 	}
 
-	// Se o diff for muito grande, limitar para não sobrecarregar o modelo
+	// Obter estatísticas das alterações
+	statsCmd := exec.Command("git", "-C", r.Path, "diff", "--stat")
+	statsOutput, err := statsCmd.Output()
+	if err == nil {
+		summary += "\nEstatísticas das alterações:\n" + string(statsOutput) + "\n"
+	}
+
+	// Aumentar o limite do diff para capturar mais contexto
 	diff := string(output)
-	maxDiffSize := 4000 // Limitar para não exceder o contexto do modelo
+	maxDiffSize := 8000 // Aumentado para obter mais contexto
 	if len(diff) > maxDiffSize {
 		diff = diff[:maxDiffSize] + "...\n[Diff truncado devido ao tamanho]"
 	}
 
-	return summary + diff, nil
+	return summary + "\nDiff completo:\n" + diff, nil
 }
 
 // hasStaged verifica se há alterações staged no repositório
