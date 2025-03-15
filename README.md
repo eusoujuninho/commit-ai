@@ -16,6 +16,7 @@ Commit-AI analyzes changes made in a Git repository and generates meaningful com
 - Includes persistent and customizable configuration
 - Offers "dry-run" mode to preview messages before committing
 - Features continuous monitoring with automatic commits (Watcher mode)
+- User-friendly installation and configuration wizards
 
 ## Installation
 
@@ -31,7 +32,7 @@ For a quick and user-friendly installation:
 
 ```bash
 # Clone the repository
-git clone https://github.com/user/commit-ai.git
+git clone https://github.com/eusoujuninho/commit-ai.git
 
 # Navigate to the directory
 cd commit-ai
@@ -63,7 +64,7 @@ You don't need to have Go installed to use the pre-compiled binaries. Simply dow
 
 ```bash
 # Clone the repository
-git clone https://github.com/user/commit-ai.git
+git clone https://github.com/eusoujuninho/commit-ai.git
 
 # Navigate to the directory
 cd commit-ai
@@ -80,6 +81,12 @@ On first run, configure the tool:
 
 ```bash
 commit-ai --configure
+```
+
+For a more user-friendly guided setup:
+
+```bash
+./setup-wizard.sh
 ```
 
 ### Basic Usage
@@ -132,6 +139,27 @@ The watcher mode is perfect for:
 
 Watcher mode can be combined with `--dry-run` to test the behavior without making actual commits.
 
+### Installation Wizard
+
+The installation wizard (`install.sh`) provides a seamless experience for installing Commit-AI by:
+
+- Automatically detecting your operating system
+- Installing the appropriate binary for your platform
+- Setting up the correct permissions
+- Adding Commit-AI to your PATH
+- Guiding you through initial configuration
+
+### Setup Wizard
+
+The setup wizard (`setup-wizard.sh`) offers a friendly, interactive configuration experience:
+
+- Visual, step-by-step configuration process
+- Clear explanations of all available options
+- Simple selection of AI providers and languages
+- Easy API key configuration for various providers
+- Guided setup of repository paths and automatic commit options
+- Helpful tips for using Commit-AI after setup
+
 ## Contributing
 
 We welcome contributions to Commit-AI! Here's how you can help:
@@ -140,7 +168,7 @@ We welcome contributions to Commit-AI! Here's how you can help:
 
 If you find a bug or have a suggestion for improvement:
 
-1. Check if the issue already exists in the [Issues](https://github.com/user/commit-ai/issues) section
+1. Check if the issue already exists in the [Issues](https://github.com/eusoujuninho/commit-ai/issues) section
 2. If not, create a new issue with a descriptive title and detailed information:
    - Steps to reproduce the problem
    - Expected behavior
