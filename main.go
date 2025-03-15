@@ -178,13 +178,56 @@ func main() {
 
 	// Confirmar commit
 	if !cfg.AutoCommit {
-		fmt.Print("Fazer commit com esta mensagem? (s/n): ")
+		// Adaptar a mensagem de confirmação e opções conforme o idioma
+		var confirmPrompt string
+		var acceptedResponses []string
+
+		switch cfg.Language {
+		case "en":
+			confirmPrompt = "Make commit with this message? [Y/n]: "
+			acceptedResponses = []string{"", "y", "yes"}
+		case "es":
+			confirmPrompt = "¿Hacer commit con este mensaje? [S/n]: "
+			acceptedResponses = []string{"", "s", "si", "sí"}
+		case "fr":
+			confirmPrompt = "Effectuer un commit avec ce message? [O/n]: "
+			acceptedResponses = []string{"", "o", "oui"}
+		case "de":
+			confirmPrompt = "Commit mit dieser Nachricht durchführen? [J/n]: "
+			acceptedResponses = []string{"", "j", "ja"}
+		default: // português
+			confirmPrompt = "Fazer commit com esta mensagem? [S/n]: "
+			acceptedResponses = []string{"", "s", "sim"}
+		}
+
+		fmt.Print(confirmPrompt)
 		reader := bufio.NewReader(os.Stdin)
 		confirm, _ := reader.ReadString('\n')
 		confirm = strings.TrimSpace(strings.ToLower(confirm))
 
-		if confirm != "s" && confirm != "sim" {
-			fmt.Println("Operação cancelada pelo usuário.")
+		// Verificar se a resposta é aceita (incluindo vazio como valor padrão)
+		isAccepted := false
+		for _, response := range acceptedResponses {
+			if confirm == response {
+				isAccepted = true
+				break
+			}
+		}
+
+		if !isAccepted {
+			// Adaptar a mensagem de cancelamento ao idioma
+			switch cfg.Language {
+			case "en":
+				fmt.Println("Operation canceled by the user.")
+			case "es":
+				fmt.Println("Operación cancelada por el usuario.")
+			case "fr":
+				fmt.Println("Opération annulée par l'utilisateur.")
+			case "de":
+				fmt.Println("Vorgang vom Benutzer abgebrochen.")
+			default: // português
+				fmt.Println("Operação cancelada pelo usuário.")
+			}
 			os.Exit(0)
 		}
 	}
