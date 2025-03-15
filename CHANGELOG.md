@@ -5,6 +5,21 @@ All notable changes to the Commit-AI project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2024-03-16
+
+### Added
+- Watcher mode for continuous monitoring and automatic commits
+- User-friendly installation script (`install.sh`)
+- Interactive setup wizard for easy configuration (`setup-wizard.sh`)
+- Support for ignoring specific files/patterns in watcher mode
+- Improved documentation with detailed examples for all new features
+- Better handling of repository path resolution
+
+### Changed
+- Updated repository references to point to the correct GitHub account
+- Improved error handling in file monitoring
+- Enhanced configuration process with clearer instructions
+
 ## [0.1.0] - 2024-03-15
 
 ### Added
