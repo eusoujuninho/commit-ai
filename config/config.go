@@ -9,23 +9,33 @@ import (
 
 // Config armazena a configuração da aplicação
 type Config struct {
-	AIProvider  string `json:"ai_provider"`
-	OpenAIKey   string `json:"openai_key"`
-	GeminiKey   string `json:"gemini_key"`
-	RepoPath    string `json:"repo_path"`
-	AutoCommit  bool   `json:"auto_commit"`
-	CommitStyle string `json:"commit_style"`
+	AIProvider    string `json:"ai_provider"`
+	OpenAIKey     string `json:"openai_key"`
+	GeminiKey     string `json:"gemini_key"`
+	ClaudeKey     string `json:"claude_key"`     // Nova chave para API do Claude
+	DeepSeekKey   string `json:"deepseek_key"`   // Nova chave para API do DeepSeek
+	OpenRouterKey string `json:"openrouter_key"` // Nova chave para API do OpenRouter
+	GrokKey       string `json:"grok_key"`       // Nova chave para API do Grok
+	RepoPath      string `json:"repo_path"`
+	AutoCommit    bool   `json:"auto_commit"`
+	CommitStyle   string `json:"commit_style"`
+	Language      string `json:"language"` // Idioma para as mensagens de commit
 }
 
 // DefaultConfig retorna uma configuração padrão
 func DefaultConfig() *Config {
 	return &Config{
-		AIProvider:  "gemini",
-		OpenAIKey:   "",
-		GeminiKey:   "",
-		RepoPath:    "",
-		AutoCommit:  false,
-		CommitStyle: "conventional",
+		AIProvider:    "gemini",
+		OpenAIKey:     "",
+		GeminiKey:     "",
+		ClaudeKey:     "", // Inicializado vazio
+		DeepSeekKey:   "", // Inicializado vazio
+		OpenRouterKey: "", // Inicializado vazio
+		GrokKey:       "", // Inicializado vazio
+		RepoPath:      "",
+		AutoCommit:    false,
+		CommitStyle:   "conventional",
+		Language:      "pt-br", // Português Brasil como idioma padrão
 	}
 }
 

@@ -24,7 +24,8 @@ func main() {
 	dryRunFlag := flag.Bool("dry-run", false, "Apenas mostrar a mensagem de commit sem fazer o commit")
 	repoPathFlag := flag.String("repo", "", "Caminho para o repositório Git")
 	versionFlag := flag.Bool("version", false, "Mostrar a versão do aplicativo")
-	providerFlag := flag.String("provider", "", "Provedor de IA a ser usado (openai ou gemini)")
+	providerFlag := flag.String("provider", "", "Provedor de IA a ser usado (openai, gemini, claude, deepseek, openrouter, grok)")
+	languageFlag := flag.String("language", "", "Idioma para a mensagem de commit (pt-br, en, es, fr, de)")
 
 	// Analisar flags
 	flag.Parse()
@@ -45,6 +46,11 @@ func main() {
 	// Configurar o provedor a partir da flag, se fornecida
 	if *providerFlag != "" {
 		cfg.AIProvider = *providerFlag
+	}
+
+	// Configurar idioma a partir da flag, se fornecida
+	if *languageFlag != "" {
+		cfg.Language = *languageFlag
 	}
 
 	// Verificar se a chave do Gemini está definida e usar o padrão se necessário
@@ -122,14 +128,42 @@ func main() {
 	case "gemini":
 		fmt.Println("Usando provedor Gemini...")
 		provider = ai.NewGeminiProvider(cfg.GeminiKey)
+	case "claude":
+		fmt.Println("Usando provedor Claude (Anthropic)...")
+		provider = ai.NewClaudeProvider(cfg.ClaudeKey)
+	case "deepseek":
+		fmt.Println("Usando provedor DeepSeek...")
+		provider = ai.NewDeepSeekProvider(cfg.DeepSeekKey)
+	case "openrouter":
+		fmt.Println("Usando provedor OpenRouter...")
+		provider = ai.NewOpenRouterProvider(cfg.OpenRouterKey)
+	case "grok":
+		fmt.Println("Usando provedor Grok (xAI)...")
+		provider = ai.NewGrokProvider(cfg.GrokKey)
 	default:
 		fmt.Fprintf(os.Stderr, "Provedor de IA desconhecido: %s, usando Gemini como fallback\n", cfg.AIProvider)
 		provider = ai.NewGeminiProvider(cfg.GeminiKey)
 	}
 
+	// Mostrar idioma sendo usado
+	var idiomaTexto string
+	switch cfg.Language {
+	case "en":
+		idiomaTexto = "inglês"
+	case "es":
+		idiomaTexto = "espanhol"
+	case "fr":
+		idiomaTexto = "francês"
+	case "de":
+		idiomaTexto = "alemão"
+	default:
+		idiomaTexto = "português"
+	}
+	fmt.Printf("Idioma para mensagens: %s\n", idiomaTexto)
+
 	// Gerar mensagem de commit
 	fmt.Println("Gerando mensagem de commit com IA...")
-	commitMsg, err := provider.GenerateCommitMessage(changes)
+	commitMsg, err := provider.GenerateCommitMessage(changes, cfg.Language)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Erro ao gerar mensagem de commit: %v\n", err)
 		os.Exit(1)
@@ -172,22 +206,23 @@ func configureApp(cfg *config.Config) {
 	fmt.Println("=== Configuração do Commit-AI ===")
 
 	// Configurar provedor de IA
-	fmt.Printf("Provedor de IA (openai/gemini) [%s]: ", cfg.AIProvider)
+	fmt.Printf("Provedor de IA (openai/gemini/claude/deepseek/openrouter/grok) [%s]: ", cfg.AIProvider)
 	input, _ := reader.ReadString('\n')
-	input = strings.TrimSpace(input)
-	if input == "openai" || input == "gemini" {
+	input = strings.TrimSpace(strings.ToLower(input))
+	if input == "openai" || input == "gemini" || input == "claude" || input == "deepseek" || input == "openrouter" || input == "grok" {
 		cfg.AIProvider = input
 	}
 
 	// Configurar chave da API dependendo do provedor
-	if cfg.AIProvider == "openai" {
+	switch cfg.AIProvider {
+	case "openai":
 		fmt.Printf("Chave da API OpenAI [%s]: ", maskAPIKey(cfg.OpenAIKey))
 		input, _ := reader.ReadString('\n')
 		input = strings.TrimSpace(input)
 		if input != "" {
 			cfg.OpenAIKey = input
 		}
-	} else if cfg.AIProvider == "gemini" {
+	case "gemini":
 		currentKey := cfg.GeminiKey
 		if currentKey == "" {
 			currentKey = defaultGeminiAPIKey
@@ -201,6 +236,42 @@ func configureApp(cfg *config.Config) {
 			// Se a chave ainda não estiver configurada, usar a padrão
 			cfg.GeminiKey = defaultGeminiAPIKey
 		}
+	case "claude":
+		fmt.Printf("Chave da API Claude (Anthropic) [%s]: ", maskAPIKey(cfg.ClaudeKey))
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+		if input != "" {
+			cfg.ClaudeKey = input
+		}
+	case "deepseek":
+		fmt.Printf("Chave da API DeepSeek [%s]: ", maskAPIKey(cfg.DeepSeekKey))
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+		if input != "" {
+			cfg.DeepSeekKey = input
+		}
+	case "openrouter":
+		fmt.Printf("Chave da API OpenRouter [%s]: ", maskAPIKey(cfg.OpenRouterKey))
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+		if input != "" {
+			cfg.OpenRouterKey = input
+		}
+	case "grok":
+		fmt.Printf("Chave da API Grok (xAI) [%s]: ", maskAPIKey(cfg.GrokKey))
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+		if input != "" {
+			cfg.GrokKey = input
+		}
+	}
+
+	// Configurar idioma
+	fmt.Printf("Idioma para mensagens (pt-br/en/es/fr/de) [%s]: ", cfg.Language)
+	input, _ = reader.ReadString('\n')
+	input = strings.TrimSpace(input)
+	if input == "pt-br" || input == "en" || input == "es" || input == "fr" || input == "de" {
+		cfg.Language = input
 	}
 
 	// Configurar caminho padrão do repositório
